@@ -46,7 +46,8 @@ const CompanyBaseSchema = z.object({
     .string()
     .nullable()
     .openapi({ description: 'Company description' }),
-  lei: z.string().optional().nullable(),
+  lei: z.string().optional().nullable(),  
+  metadata: MetadataSchema,
 })
 
 export const StatedTotalEmissionsSchema = z.object({

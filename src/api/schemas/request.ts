@@ -18,7 +18,7 @@ export const postCompanyBodySchema = z.object({
   internalComment: z.string().optional(),
   tags: z.array(z.string()).optional(),
   lei: z.string().optional(),
-})
+}).merge(createMetadataSchema);
 
 export const reportingPeriodBodySchema = z
   .object({

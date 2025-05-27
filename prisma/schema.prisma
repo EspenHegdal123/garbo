@@ -39,6 +39,7 @@ model Company {
 
   /// Tags to help categorize and filter companies
   tags String[]
+  metadata Metadata[]
 }
 
 /// Explicitly stated base year for comparable data
@@ -316,6 +317,7 @@ model Metadata {
   /// Verified datapoints should not be automatically updated by AI extracted or estimatated data, but always go through manual review going forward.
   verifiedByUserId String?
 
+  companyId              String?
   goalId                 String?
   initiativeId           String?
   scope1Id               String?
@@ -331,6 +333,7 @@ model Metadata {
   turnoverId             String?
   employeesId            String?
 
+  company              Company?              @relation(fields: [companyId], references: [wikidataId])
   goal                 Goal?                 @relation(fields: [goalId], references: [id])
   initiative           Initiative?           @relation(fields: [initiativeId], references: [id])
   scope1               Scope1?               @relation(fields: [scope1Id], references: [id])

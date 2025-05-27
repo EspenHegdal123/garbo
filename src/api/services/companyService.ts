@@ -23,6 +23,7 @@ class CompanyService {
   }
 
   async getCompanyWithMetadata(wikidataId: string) {
+    console.log(detailedCompanyArgs);
     const company = await prisma.company.findFirstOrThrow({
       ...detailedCompanyArgs,
       where: {
@@ -47,6 +48,7 @@ class CompanyService {
 
   async upsertCompany({
     wikidataId,
+    metadata,
     ...data
   }: {
     wikidataId: string
@@ -55,7 +57,8 @@ class CompanyService {
     url?: string
     internalComment?: string
     tags?: string[]
-    lei?: string
+    lei?: string,
+    metadata: Metadata
   }) {
     return prisma.company.upsert({
       where: {
@@ -64,13 +67,25 @@ class CompanyService {
       create: {
         ...data,
         wikidataId,
+        metadata: {
+          connect: {
+            id: metadata.id,
+          },
+        },
       },
       // TODO: Should we allow updating the wikidataId?
       // Probably yes from a business perspective, but that also means we need to update all related records too.
       // Updating the primary key can be tricky, especially with backups using the old primary key no longer being compatible.
       // This might be a reason why we shouldn't use wikidataId as our primary key in the DB.
       // However, no matter what, we could still use wikidataId in the API and in the URL structure.
-      update: { ...data },
+      update: { 
+        ...data,
+        metadata: {
+          connect: {
+            id: metadata.id,
+          },
+        },
+       },
     })
   }
 
