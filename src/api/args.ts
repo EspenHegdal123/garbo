@@ -68,6 +68,7 @@ export const detailedCompanyArgs = {
     wikidataId: true,
     name: true,
     description: true,
+    lei: true,
     reportingPeriods: {
       select: {
         id: true,
@@ -217,6 +218,7 @@ export const detailedCompanyArgs = {
     baseYear: {
       select: { id: true, year: true, metadata: metadataArgs },
     },
+    metadata: metadataArgs,
   },
 } satisfies Prisma.CompanyDefaultArgs
 

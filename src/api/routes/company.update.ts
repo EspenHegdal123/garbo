@@ -8,10 +8,13 @@ import {
 } from '../schemas'
 import { getTags } from '../../config/openapi'
 import { PostCompanyBody, WikidataIdParams } from '../types'
+import { string, z } from 'zod'
+import { metadataService } from '../services/metadataService'
+
 
 export async function companyUpdateRoutes(app: FastifyInstance) {
   app.post(
-    '/',
+    '/:wikidataId',
     {
       schema: {
         summary: 'Create or update a company',
@@ -32,10 +35,17 @@ export async function companyUpdateRoutes(app: FastifyInstance) {
       }>,
       reply
     ) => {
-      const { name, wikidataId, description, internalComment, tags, url } =
-        request.body
+      const { name, wikidataId, description, internalComment, tags, url, lei, metadata } =
+        request.body;       
+      const user = request.user;
 
-      try { 
+      try {
+        const companyMetadata = await metadataService.createMetadata({
+          metadata,
+          user,
+          verified: !user.bot,
+        })
+
         await companyService.upsertCompany({
           name,
           wikidataId,
@@ -43,6 +53,8 @@ export async function companyUpdateRoutes(app: FastifyInstance) {
           internalComment,
           tags,
           url,
+          lei,
+          metadata: companyMetadata,
         })
       } catch(error) {
         console.error('ERROR Creation or update of company failed:', error)
@@ -52,4 +64,5 @@ export async function companyUpdateRoutes(app: FastifyInstance) {
       return reply.send({ ok: true })
     }
   )
+
 }
