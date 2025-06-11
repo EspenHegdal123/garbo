@@ -22,10 +22,8 @@ const nlmParsePDF = new DiscordWorker(
     job.opts.attempts = 1
     
     const name = url.slice(-20)
-    const base = {
-      data: {
-        ...job.data,
-      },
+    const baseData = {
+        ...job.data,  // defining the basedata.
     }
 
     job.log(`Downloading from url: ${url}`)
@@ -63,19 +61,26 @@ const nlmParsePDF = new DiscordWorker(
             job.editMessage(`❌ Fel vid tolkning av PDF: ${err.message}. Försöker med en annan parser...`)
       
             const precheck = await flow.add({
-              ...base,
               name: 'precheck ' + name,
               queueName: QUEUE_NAMES.PRECHECK,
+              data: {
+                ...baseData,
+              },
               children: [
                 {
-                  ...base,
                   name: 'indexMarkdown ' + name,
                   queueName: QUEUE_NAMES.INDEX_MARKDOWN,
+                  data: {
+                    ...baseData,
+                  },
                   children: [
                     {
-                      ...base,
+                  
                       name: 'doclingParsePDF ' + name,
                       queueName: QUEUE_NAMES.DOCLING_PARSE_PDF,
+                      data:{
+                        ...baseData,
+                      }
                     },
                   ],
                 },
@@ -94,19 +99,25 @@ const nlmParsePDF = new DiscordWorker(
           await job.editMessage('❌ Error parsing PDF: No content, trying with another parser...');
 
           const precheck = await flow.add({
-            ...base,
             name: 'precheck ' + name,
             queueName: QUEUE_NAMES.PRECHECK,
+            data: {
+              ...baseData,
+            },
             children: [
               {
-                ...base,
                 name: 'indexMarkdown ' + name,
                 queueName: QUEUE_NAMES.INDEX_MARKDOWN,
+                data: {
+                  ...baseData,
+                },
                 children: [
                   {
-                    ...base,
                     name: 'doclingParsePDF ' + name,
                     queueName: QUEUE_NAMES.DOCLING_PARSE_PDF,
+                    data: {
+                      ...baseData,
+                    },
                   },
                 ],
               },
@@ -128,19 +139,24 @@ const nlmParsePDF = new DiscordWorker(
         await job.editMessage(`🤖 Tolkar tabeller...`)
 
         const precheck = await flow.add({
-          ...base,
           name: 'precheck ' + name,
           queueName: QUEUE_NAMES.PRECHECK,
+          data: {
+            ...baseData,
+            cachedMarkdown: markdown,
+          },
           children: [
             {
-              ...base,
               name: 'indexMarkdown ' + name,
               queueName: QUEUE_NAMES.INDEX_MARKDOWN,
+              data: {
+                ...baseData,
+                markdown,
+              },
               children: [
                 {
-                  ...base,
                   data: {
-                    ...base.data,
+                    ...baseData,
                     // Pass json explicitly where we need it
                     json,
                   },
@@ -151,6 +167,7 @@ const nlmParsePDF = new DiscordWorker(
             },
           ],
         })
+        
         job.log('flow started: ' + precheck.job?.id)
       } else {
         job.editMessage(`✅ PDF redan tolkad och indexerad. Fortsätter...`)
@@ -160,7 +177,7 @@ const nlmParsePDF = new DiscordWorker(
         ])
 
         const added = await precheck.queue.add('precheck', {
-          ...job.data,
+          ...baseData,
           cachedMarkdown: markdown,
         })
         return added.id

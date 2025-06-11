@@ -17,7 +17,6 @@ export class LEIJob extends DiscordJob {
   };
 }
 
-
 const extractLEI = new DiscordWorker<LEIJob>(
   QUEUE_NAMES.EXTRACT_LEI,
   async (job: LEIJob) => {

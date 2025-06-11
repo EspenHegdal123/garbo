@@ -85,6 +85,7 @@ const checkDB = new DiscordWorker(
       lei,
     } = childrenValues
   
+    // DOES IT MAKE SENSE TO HAVE LEI NUMBERS IN THE BASE?
     const base = {
       name: companyName,
       data: {
@@ -108,7 +109,7 @@ const checkDB = new DiscordWorker(
     await job.editMessage(`🤖 Saving data...`)
   
     await flow.add({
-      ...base,
+      ...base, // Redundant to have it here and under?
       queueName: QUEUE_NAMES.SEND_COMPANY_LINK,
       data: {
         ...base.data,

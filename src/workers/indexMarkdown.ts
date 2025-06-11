@@ -9,8 +9,9 @@ const indexMarkdown = new DiscordWorker(
   QUEUE_NAMES.INDEX_MARKDOWN,
   async (job: IndexMarkdownJob) => {
     const { url } = job.data
-    const childrenValues = await job.getChildrenEntries()
-    const { markdown }: { markdown: string } = childrenValues
+
+    const {markdown} = await job.getChildrenEntries()
+
 
     await job.sendMessage(`🤖 Sparar i vektordatabas...`)
     job.log(

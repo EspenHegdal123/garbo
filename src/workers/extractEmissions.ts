@@ -28,7 +28,7 @@ const extractEmissions = new DiscordWorker<ExtractEmissionsJob>(
       data: { ...job.data, ...childrenValues },
       queueName: QUEUE_NAMES.FOLLOW_UP,
       opts: {
-        attempts: 3,
+        attempts: 3, //potenitally redundant to have here..??
       },
     }
 

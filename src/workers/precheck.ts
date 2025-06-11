@@ -129,11 +129,13 @@ const precheck = new DiscordWorker(
         markdown.substring(0, 5000)
       )
       
-      const base = {
-        data: { ...baseData, companyName, description },
-        opts: {
-          attempts: 3,
+      const base = { //for the moment we dont read the base. WE had base.data earlier, but now we specify what fields we want in the flows. baseData + companyName + description
+        data: { 
+          ...baseData,
+          companyName,
+          description
         },
+        
       }
         
       job.log('Company description:\n' + description)
@@ -144,10 +146,12 @@ const precheck = new DiscordWorker(
         const extractEmissions = await flow.add({
           name: 'precheck done ' + companyName,
           queueName: QUEUE_NAMES.EXTRACT_EMISSIONS,
-          data: { ...base.data },
+          data: {
+             ...base.data,
+             },
           children: [
             {
-              ...base,
+              
               name: 'guessWikidata ' + companyName,
               queueName: QUEUE_NAMES.GUESS_WIKIDATA,
               data: {
@@ -156,18 +160,14 @@ const precheck = new DiscordWorker(
               },
             },
             {
-              ...base,
               queueName: QUEUE_NAMES.FOLLOW_UP,
               name: 'fiscalYear ' + companyName,
               data: {
-                ...base.data,
+                ...baseData, //Take a look at this one. Do we need the companyName and the description here?
                 type: JobType.FiscalYear,
               },
             },
           ],
-          opts: {
-            attempts: 3,
-          },
         })
         return extractEmissions.job?.id
       } catch (error) {
